@@ -18,6 +18,6 @@ export class MeTubeSocket extends Socket {
     const token = authService.token;
     const auth = token ? { token } : {};
 
-    super({ url: '', options: { path, auth } }, appRef);
+    super({ url: '', options: { path, auth } as any }, appRef);
   }
 }
