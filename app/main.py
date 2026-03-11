@@ -152,6 +152,7 @@ class ObjectSerializer(json.JSONEncoder):
         # Fall back to default behavior
         return json.JSONEncoder.default(self, obj)
 
+routes = web.RouteTableDef()
 serializer = ObjectSerializer()
 app = web.Application(middlewares=[auth.get_auth_middleware(config.URL_PREFIX)])
 sio = socketio.AsyncServer(cors_allowed_origins='*')
@@ -164,7 +165,6 @@ async def login(request):
 async def register(request):
     return await auth.register(request)
 sio.attach(app, socketio_path=config.URL_PREFIX + 'socket.io')
-routes = web.RouteTableDef()
 VALID_SUBTITLE_FORMATS = {'srt', 'txt', 'vtt', 'ttml', 'sbv', 'scc', 'dfxp'}
 VALID_SUBTITLE_MODES = {'auto_only', 'manual_only', 'prefer_manual', 'prefer_auto'}
 SUBTITLE_LANGUAGE_RE = re.compile(r'^[A-Za-z0-9][A-Za-z0-9-]{0,34}$')
