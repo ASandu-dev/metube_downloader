@@ -8,7 +8,7 @@ from aiohttp import web
 
 log = logging.getLogger('auth')
 
-SECRET_KEY = os.environ.get('SECRET_KEY', 'metube-secret-key-change-me')
+SECRET_KEY = os.environ.get('SECRET_KEY', 'metube-secret-key-change-me-at-least-32-chars')
 TOKEN_EXPIRATION = 24 * 60 * 60  # 24 hours
 USERS_FILE = os.path.join(os.environ.get('STATE_DIR', '.'), 'users.json')
 
@@ -113,7 +113,7 @@ def get_auth_middleware(url_prefix):
         if path.startswith(url_prefix):
             rel_path = path[len(url_prefix):]
 
-        if rel_path in public_routes or rel_path.startswith('static/'):
+        if rel_path in public_routes or rel_path.startswith('static/') or rel_path.startswith('socket.io'):
              return await handler(request)
 
         # Allow static assets
