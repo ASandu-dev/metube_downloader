@@ -16,6 +16,7 @@ import pathlib
 import re
 from watchfiles import DefaultFilter, Change, awatch
 
+import auth
 from ytdl import DownloadQueueNotifier, DownloadQueue
 from yt_dlp.version import __version__ as yt_dlp_version
 
@@ -152,8 +153,16 @@ class ObjectSerializer(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 serializer = ObjectSerializer()
-app = web.Application()
+app = web.Application(middlewares=[auth.get_auth_middleware(config.URL_PREFIX)])
 sio = socketio.AsyncServer(cors_allowed_origins='*')
+
+@routes.post(config.URL_PREFIX + 'login')
+async def login(request):
+    return await auth.login(request)
+
+@routes.post(config.URL_PREFIX + 'register')
+async def register(request):
+    return await auth.register(request)
 sio.attach(app, socketio_path=config.URL_PREFIX + 'socket.io')
 routes = web.RouteTableDef()
 VALID_SUBTITLE_FORMATS = {'srt', 'txt', 'vtt', 'ttml', 'sbv', 'scc', 'dfxp'}
@@ -337,7 +346,23 @@ async def history(request):
     return web.Response(text=serializer.encode(history))
 
 @sio.event
-async def connect(sid, environ):
+async def connect(sid, environ, auth_data=None):
+    # If there are no users, allow everyone to connect (first time setup)
+    # Actually, it's better to always require a token if users exist.
+    users = auth.load_users()
+    if users:
+        token = None
+        if auth_data and 'token' in auth_data:
+            token = auth_data['token']
+        elif 'HTTP_AUTHORIZATION' in environ:
+            auth_header = environ['HTTP_AUTHORIZATION']
+            if auth_header.startswith('Bearer '):
+                token = auth_header.split(' ')[1]
+        
+        if not token or not auth.verify_token(token):
+            log.warning(f"Unauthorized socket.io connection attempt: {sid}")
+            return False
+
     log.info(f"Client connected: {sid}")
     await sio.emit('all', serializer.encode(dqueue.get()), to=sid)
     await sio.emit('configuration', serializer.encode(config), to=sid)

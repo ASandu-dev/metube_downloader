@@ -9,11 +9,11 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { faTrashAlt, faCheckCircle, faTimesCircle, faRedoAlt, faSun, faMoon, faCheck, faCircleHalfStroke, faDownload, faExternalLinkAlt, faFileImport, faFileExport, faCopy, faClock, faTachometerAlt } from '@fortawesome/free-solid-svg-icons';
 import { faGithub } from '@fortawesome/free-brands-svg-icons';
 import { CookieService } from 'ngx-cookie-service';
-import { DownloadsService } from './services/downloads.service';
+import { DownloadsService, AuthService } from './services';
 import { Themes } from './theme';
 import { Download, Status, Theme , Quality, Format, Formats, State } from './interfaces';
 import { EtaPipe, SpeedPipe, FileSizePipe } from './pipes';
-import { MasterCheckboxComponent , SlaveCheckboxComponent} from './components/';
+import { MasterCheckboxComponent , SlaveCheckboxComponent, LoginComponent } from './components/';
 
 @Component({
   selector: 'app-root',
@@ -29,12 +29,14 @@ import { MasterCheckboxComponent , SlaveCheckboxComponent} from './components/';
         FileSizePipe,
         MasterCheckboxComponent,
         SlaveCheckboxComponent,
+        LoginComponent,
   ],
   templateUrl: './app.html',
   styleUrl: './app.sass',
 })
 export class App implements AfterViewInit, OnInit {
   downloads = inject(DownloadsService);
+  authService = inject(AuthService);
   private cookieService = inject(CookieService);
   private http = inject(HttpClient);
 

@@ -4,51 +4,47 @@
       <img src="assets/icons/android-chrome-192x192.png" alt="MeTube Logo" height="32" class="me-2">
       MeTube
     </a>
-    <div class="download-metrics">
-      @if (activeDownloads > 0) {
-        <div class="metric">
-          <fa-icon [icon]="faDownload" class="text-primary" />
-          <span>{{activeDownloads}} downloading</span>
-        </div>
+    
+    @if (authService.isAuthenticated) {
+      <div class="download-metrics">
+        @if (activeDownloads > 0) {
+          <div class="metric">
+            <fa-icon [icon]="faDownload" class="text-primary" />
+            <span>{{activeDownloads}} downloading</span>
+          </div>
+        }
+        @if (queuedDownloads > 0) {
+          <div class="metric">
+            <fa-icon [icon]="faClock" class="text-warning" />
+            <span>{{queuedDownloads}} queued</span>
+          </div>
+        }
+        @if (completedDownloads > 0) {
+          <div class="metric">
+            <fa-icon [icon]="faCheck" class="text-success" />
+            <span>{{completedDownloads}} completed</span>
+          </div>
+        }
+        @if (failedDownloads > 0) {
+          <div class="metric">
+            <fa-icon [icon]="faTimesCircle" class="text-danger" />
+            <span>{{failedDownloads}} failed</span>
+          </div>
+        }
+        @if ((totalSpeed | speed) !== '') {
+          <div class="metric">
+            <fa-icon [icon]="faTachometerAlt" class="text-info" />
+            <span>{{totalSpeed | speed }}</span>
+          </div>
+        }
+      </div>
+    }
+
+    <div class="navbar-nav ms-auto d-flex flex-row align-items-center">
+      @if (authService.isAuthenticated) {
+        <span class="text-light me-3 d-none d-sm-inline">{{ authService.username$ | async }}</span>
+        <button class="btn btn-link nav-link me-3" (click)="authService.logout()">Logout</button>
       }
-      @if (queuedDownloads > 0) {
-        <div class="metric">
-          <fa-icon [icon]="faClock" class="text-warning" />
-          <span>{{queuedDownloads}} queued</span>
-        </div>
-      }
-      @if (completedDownloads > 0) {
-        <div class="metric">
-          <fa-icon [icon]="faCheck" class="text-success" />
-          <span>{{completedDownloads}} completed</span>
-        </div>
-      }
-      @if (failedDownloads > 0) {
-        <div class="metric">
-          <fa-icon [icon]="faTimesCircle" class="text-danger" />
-          <span>{{failedDownloads}} failed</span>
-        </div>
-      }
-      @if ((totalSpeed | speed) !== '') {
-        <div class="metric">
-          <fa-icon [icon]="faTachometerAlt" class="text-info" />
-          <span>{{totalSpeed | speed }}</span>
-        </div>
-      }
-    </div>
-    <!--
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsDefault" aria-controls="navbarsDefault" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarsDefault">
-      <ul class="navbar-nav mr-auto">
-        <li class="nav-item active">
-          <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-        </li>
-      </ul>
-    </div>
-    -->
-    <div class="navbar-nav ms-auto">
       <div class="nav-item dropdown">
         <button class="btn btn-link nav-link py-2 px-0 px-sm-2 dropdown-toggle d-flex align-items-center"
           id="theme-select"
@@ -83,7 +79,11 @@
   </div>
 </nav>
 
-<main role="main" class="container container-xl">
+@if (!authService.isAuthenticated) {
+  <app-login />
+} @else {
+  <main role="main" class="container container-xl">
+    <!-- ... existing main content ... -->
   <form #f="ngForm">
     <div class="container add-url-box">
       <!-- Main URL Input with Download Button -->
@@ -551,3 +551,4 @@
     }
   </div>
 </footer>
+}

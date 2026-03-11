@@ -10,6 +10,8 @@ dependencies = [
     "mutagen",
     "curl-cffi",
     "watchfiles",
+    "bcrypt",
+    "PyJWT",
 ]
 
 [dependency-groups]
